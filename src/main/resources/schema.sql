@@ -14,12 +14,13 @@ CREATE TABLE  discount_cards (
  CONSTRAINT pk_discount_cards PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1;
-CREATE TABLE  products (
+CREATE SEQUENCE  IF NOT EXISTS product_seq START WITH 1 INCREMENT BY 1;
+CREATE TABLE products (
   id BIGINT NOT NULL,
- description VARCHAR(255) NOT NULL,
- price DECIMAL NOT NULL,
- CONSTRAINT pk_products PRIMARY KEY (id)
+   description VARCHAR(255) NOT NULL,
+   price DECIMAL NOT NULL,
+   status INTEGER,
+   CONSTRAINT pk_products PRIMARY KEY (id)
 );
 
 CREATE SEQUENCE order_seq START WITH 1 INCREMENT BY 1;
