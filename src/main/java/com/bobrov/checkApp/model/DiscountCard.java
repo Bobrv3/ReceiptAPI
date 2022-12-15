@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "discount_card")
+@Table(name = "discount_cards")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

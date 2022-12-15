@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,9 +35,6 @@ public class Product {
 
     @Column(nullable = false)
     private String description;
-
-    @Column(nullable = false)
-    private int quantity;
 
     @Column(nullable = false)
     private BigDecimal price;
