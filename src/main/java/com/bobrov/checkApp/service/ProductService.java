@@ -2,17 +2,19 @@ package com.bobrov.checkApp.service;
 
 
 import com.bobrov.checkApp.model.Product;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 public interface ProductService {
-    Product findById(Long id);
+    Product findById(@Min(1) Long id);
 
-    List<Product> findAll(Integer offset, Integer limit);
+    Page<Product> findAll(@Min(0) Integer offset, @Min(1) Integer limit);
 
-    Product save(Product product);
+    Product save(@NotNull Product product);
 
-    Product update(Product product);
+    Product update(@Min(1) Long id, @NotNull Product product);
 
-    void delete(Long id);
+    void delete(@Min(1) Long id);
 }

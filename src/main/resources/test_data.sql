@@ -8,10 +8,10 @@ VALUES
 INSERT
 INTO
   products
-  (id, description, price, status)
+  (id, description, price, sale_status, status)
 VALUES
-  (nextval('product_seq'), 'Milk', 1.6, 0),
-  (nextval('product_seq'), 'Bread', 2, null);
+  (nextval('product_seq'), 'Milk', 1.6, 0, 0),
+  (nextval('product_seq'), 'Bread', 2, null, 0);
 
 INSERT
 INTO

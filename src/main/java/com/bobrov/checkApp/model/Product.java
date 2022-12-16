@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +27,11 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "status = 0")
 public class Product {
+    public enum ProductStatus {
+        ENABLE, DELETED
+    }
     private static final String SEQ_NAME = "product_seq";
 
     @Id
@@ -42,8 +47,13 @@ public class Product {
     private BigDecimal price;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column
-    private SaleStatus status;
+    @Column(name = "sale_status")
+    private SaleStatus saleStatus;
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
+    @Builder.Default
+    private ProductStatus status = ProductStatus.ENABLE;
 
     @Override
     public boolean equals(Object o) {

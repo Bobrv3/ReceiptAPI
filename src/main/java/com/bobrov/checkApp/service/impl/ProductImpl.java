@@ -5,13 +5,14 @@ import com.bobrov.checkApp.model.Product;
 import com.bobrov.checkApp.service.ProductService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.transaction.Transactional;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,27 +27,30 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public List<Product> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
-        return repository.findAll(PageRequest.of(offset, limit)).getContent();
+    public Page<Product> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
+        return repository.findAll(PageRequest.of(offset, limit));
     }
 
     // ToDO Product validation
     @Override
+    @Transactional
     public Product save(@NotNull Product product) {
         return repository.save(product);
     }
 
     @Override
-    public Product update(@NotNull Product product) {
-        findById(product.getId());
+    @Transactional
+    public Product update(@Min(1) Long id, @NotNull Product product) {
+        findById(id);
 
         return repository.save(product);
     }
 
     @Override
+    @Transactional
     public void delete(@Min(1) Long id) {
-        findById(id);
+        Product product = findById(id);
 
-        repository.deleteById(id);
+        product.setStatus(Product.ProductStatus.DELETED);
     }
 }

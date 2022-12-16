@@ -114,7 +114,7 @@ public class OrderImpl implements OrderService {
             List<OrderItem> items = order.getItems();
             List<BigDecimal> itemsDiscounts = new ArrayList<>();
             for (OrderItem item : items) {
-                switch (item.getProduct().getStatus()) {
+                switch (item.getProduct().getSaleStatus()) {
                     // todo возможно сделать для скидок отдельную таблицу, где смогу задавать 1) кол-во, после которого применяется скидка 2) ее размер
                     case ON_SALE_IF_QUANTITY_GT_5 -> {
                         if (item.getQuantity() > 5) {
