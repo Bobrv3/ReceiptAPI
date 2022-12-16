@@ -13,11 +13,11 @@ INTO
   products
   (id, description, price, sale_status, status)
 VALUES
-  (nextval('product_seq'), 'Milk', 1.6, null, 0),
-  (nextval('product_seq'), 'Bread', 1.45, null,0),
-  (nextval('product_seq'), 'Meat', 7.5, null, 0),
-  (nextval('product_seq'), 'Apple', 2, 0, 0),
-  (nextval('product_seq'), 'Banana', 2.45, 0, 0);
+  (nextval('product_seq'), 'Milk', 1.6, 0, 0),
+  (nextval('product_seq'), 'Bread', 1.45, 1,0),
+  (nextval('product_seq'), 'Meat', 7.5, 0, 0),
+  (nextval('product_seq'), 'Apple', 2, 1, 0),
+  (nextval('product_seq'), 'Banana', 2.45, 1, 0);
 
 INSERT
 INTO
@@ -25,7 +25,7 @@ INTO
   (id, discount_card_id, status)
 VALUES
   (nextval('order_seq'), 1, 0),
-  (nextval('order_seq'), 2, 0),
+  (nextval('order_seq'), null, 0),
   (nextval('order_seq'), 3, 0),
   (nextval('order_seq'), 4, 0),
   (nextval('order_seq'), null, 0);

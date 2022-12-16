@@ -47,8 +47,9 @@ public class Product {
     private BigDecimal price;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "sale_status")
-    private SaleStatus saleStatus;
+    @Column(name = "sale_status", nullable = false)
+    @Builder.Default
+    private SaleStatus saleStatus = SaleStatus.NOT_ON_SALE;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)

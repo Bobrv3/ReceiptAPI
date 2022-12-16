@@ -20,7 +20,7 @@ CREATE TABLE products (
   id BIGINT NOT NULL,
      description VARCHAR(16) NOT NULL,
      price DECIMAL NOT NULL,
-     sale_status INTEGER,
+     sale_status INTEGER NOT NULL,
      status INTEGER NOT NULL,
      CONSTRAINT pk_products PRIMARY KEY (id)
 );

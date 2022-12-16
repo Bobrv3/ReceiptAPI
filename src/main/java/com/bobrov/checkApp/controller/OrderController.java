@@ -40,9 +40,11 @@ public class OrderController {
         return service.findById(id);
     }
 
-    @GetMapping("/receipts/{id:\\d+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String id){
-        Resource file = service.load(id);
+    @GetMapping("/{id:\\d+}/receipt")
+    public ResponseEntity<Resource> getReceipt(@PathVariable Long id){
+        service.makeReceipt(id);
+
+        Resource file = service.load(id.toString());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment;filename=\""+file.getFilename()+"\"")

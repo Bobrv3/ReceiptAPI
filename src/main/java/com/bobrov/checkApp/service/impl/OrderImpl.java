@@ -112,7 +112,7 @@ public class OrderImpl implements OrderService {
     @Override
     @Transactional
     public void makeReceipt(@Min(1) Long id) {
-        //ToDO coorect receipt out info
+        Order order = findById(id);
 
         try (FileWriter writer = new FileWriter(String.format(FILE_PATH, DIRECTORY_PATH, id))) {
             /////// HEAD
@@ -122,7 +122,6 @@ public class OrderImpl implements OrderService {
             /////// BODY
             StringBuilder receiptBuilder = new StringBuilder(receiptHead);
 
-            Order order = findById(id);
             List<OrderItem> items = order.getItems();
             List<BigDecimal> itemsDiscounts = new ArrayList<>();
             for (OrderItem item : items) {
