@@ -10,11 +10,17 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class OrderImpl implements OrderService {
+    private static final String FILE_PATH = "%s/receipt%s.txt";
+    private static final String DIRECTORY_PATH = "./receipts";
     private OrderRepository repository;
 
     @Override
@@ -46,5 +52,20 @@ public class OrderImpl implements OrderService {
         findById(id);
 
         repository.deleteById(id);
+    }
+
+    @Override
+    public void makeReceipt(Long id) {
+        //ToDO coorect receipt out info
+
+        try {
+            Files.createDirectories(Paths.get(DIRECTORY_PATH));
+
+            FileWriter writer = new FileWriter(String.format(FILE_PATH, DIRECTORY_PATH, id));
+            writer.write("hello world");
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

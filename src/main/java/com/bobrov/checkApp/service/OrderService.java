@@ -14,4 +14,6 @@ public interface OrderService {
     Order update(Order order);
 
     void delete(Long id);
+
+    public void makeReceipt(Long id);
 }
