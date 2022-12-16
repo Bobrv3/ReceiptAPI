@@ -1,19 +1,21 @@
 package com.bobrov.checkApp.service;
 
 import com.bobrov.checkApp.model.Order;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 public interface OrderService {
-    Order findById(Long id);
+    Order findById(@Min(1) Long id);
 
-    List<Order> findAll(Integer offset, Integer limit);
+    Page<Order> findAll(@Min(0) Integer offset, @Min(1) Integer limit);
 
-    Order save(Order order);
+    Order save(@NotNull Order order);
 
-    Order update(Order order);
+    Order update(@Min(1) Long id, @NotNull Order order);
 
-    void delete(Long id);
+    void delete(@Min(1) Long id);
 
-    public void makeReceipt(Long id);
+    void makeReceipt(@Min(1) Long id);
 }

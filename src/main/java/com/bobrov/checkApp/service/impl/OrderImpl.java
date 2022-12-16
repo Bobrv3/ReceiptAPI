@@ -6,7 +6,7 @@ import com.bobrov.checkApp.model.OrderItem;
 import com.bobrov.checkApp.service.OrderService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +61,12 @@ public class OrderImpl implements OrderService {
             """;
 
     @PostConstruct
-    public void init() throws IOException {
-        Files.createDirectories(Paths.get(DIRECTORY_PATH));
+    public void init() {
+        try {
+            Files.createDirectories(Paths.get(DIRECTORY_PATH));
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize folder for upload!");
+        }
     }
 
     @Override
@@ -72,32 +76,34 @@ public class OrderImpl implements OrderService {
     }
 
     @Override
-    public List<Order> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
-        return repository.findAll(PageRequest.of(offset, limit)).getContent();
+    public Page<Order> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
+        return repository.findAll(PageRequest.of(offset, limit));
     }
 
     // ToDO order validation(!null, description: length < 16)
     @Override
+    @Transactional
     public Order save(@NotNull Order order) {
         return repository.save(order);
     }
 
     @Override
-    public Order update(@NotNull Order order) {
-        findById(order.getId());
-
+    @Transactional
+    public Order update(@Min(1) Long id, @NotNull Order order) {
+        findById(id);
+        // Todo доделать с mapstruct
         return repository.save(order);
     }
 
     @Override
+    @Transactional
     public void delete(@Min(1) Long id) {
-        findById(id);
+        Order order = findById(id);
 
-        repository.deleteById(id);
+        order.setStatus(Order.OrderStatus.DELETED);
     }
 
     @Override
-    @SneakyThrows
     @Transactional
     public void makeReceipt(@Min(1) Long id) {
         //ToDO coorect receipt out info
@@ -145,6 +151,8 @@ public class OrderImpl implements OrderService {
             receiptBuilder.append(String.format(FOOTER_OF_RECEIPT, totalPriceWithoutDiscount, totalDiscountByCard, totalDiscount, totalPriceWithDiscount));
 
             writer.write(receiptBuilder.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("Problems with file for saving receipt");
         }
     }
 

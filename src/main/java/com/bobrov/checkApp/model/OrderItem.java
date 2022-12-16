@@ -1,5 +1,6 @@
 package com.bobrov.checkApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,7 @@ public class OrderItem {
     @MapsId("orderId")
     @ManyToOne(optional = false)
     @ToString.Exclude
+    @JsonIgnore
     private Order order;
 
     void setOrder(Order order) {

@@ -6,8 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,7 +30,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "status = 0")
 public class Order {
+    public enum OrderStatus {
+        ENABLE, DELETED
+    }
+
     private static final String SEQ_NAME = "order_seq";
 
     @Id
@@ -44,6 +53,11 @@ public class Order {
     @JoinColumn(name = "order_id")
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
+
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
+    @Builder.Default
+    private OrderStatus status = OrderStatus.ENABLE;
 
     public void addItem(OrderItem item) {
         item.setOrder(this);

@@ -16,10 +16,10 @@ VALUES
 INSERT
 INTO
   orders
-  (id, discount_card_id)
+  (id, discount_card_id, status)
 VALUES
-  (nextval('order_seq'), 1),
-  (nextval('order_seq'), null);
+  (nextval('order_seq'), 1, 0),
+  (nextval('order_seq'), null, 0);
 
   INSERT
 INTO
