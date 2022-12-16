@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DiscountCardImpl implements DiscountCardService {
-    private DiscountCardRepository repository;
+    private final DiscountCardRepository repository;
 
     @Override
     public DiscountCard findById(@Min(1) Long id) {

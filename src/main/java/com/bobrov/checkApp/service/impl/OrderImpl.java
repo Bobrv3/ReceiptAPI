@@ -21,7 +21,7 @@ import java.util.List;
 public class OrderImpl implements OrderService {
     private static final String FILE_PATH = "%s/receipt%s.txt";
     private static final String DIRECTORY_PATH = "./receipts";
-    private OrderRepository repository;
+    private final OrderRepository repository;
 
     @Override
     public Order findById(@Min(1) Long id) {

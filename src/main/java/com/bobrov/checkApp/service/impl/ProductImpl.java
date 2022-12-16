@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class ProductImpl implements ProductService {
-    private ProductRepository repository;
+    private final ProductRepository repository;
 
     @Override
     public Product findById(@Min(1) Long id) {
