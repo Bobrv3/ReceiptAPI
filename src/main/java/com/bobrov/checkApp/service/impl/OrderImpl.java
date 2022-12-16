@@ -6,6 +6,8 @@ import com.bobrov.checkApp.model.OrderItem;
 import com.bobrov.checkApp.service.OrderService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,7 +33,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OrderImpl implements OrderService {
-    private static final String FILE_PATH = "%s/receipt%s.txt";
+
+    private final Path path = Paths.get("receipts");
+    private static final String FILE_PATH = "%s/%s.txt";
     private static final String DIRECTORY_PATH = "./receipts";
     private final OrderRepository repository;
     private static final String HEAD_OF_RECEIPT = """
@@ -154,6 +160,23 @@ public class OrderImpl implements OrderService {
         } catch (IOException e) {
             throw new RuntimeException("Problems with file for saving receipt");
         }
+    }
+
+    @Override
+    public Resource load(String id) {
+        Path file = path.resolve(String.format("%s.txt", id));
+
+        try {
+            Resource resource = new UrlResource(file.toUri());
+            if(resource.exists() || resource.isReadable()){
+                return resource;
+            }else{
+                throw new RuntimeException("Could not read the file.");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error:"+e.getMessage());
+        }
+
     }
 
     private BigDecimal makeBodyItemWithSale(StringBuilder receiptBuilder, OrderItem item) {

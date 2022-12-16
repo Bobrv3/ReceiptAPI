@@ -3,7 +3,9 @@ package com.bobrov.checkApp.controller;
 import com.bobrov.checkApp.model.Order;
 import com.bobrov.checkApp.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,6 +38,15 @@ public class OrderController {
     @GetMapping("/{id:\\d+}")
     public Order get(@PathVariable Long id) {
         return service.findById(id);
+    }
+
+    @GetMapping("/receipts/{id:\\d+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String id){
+        Resource file = service.load(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment;filename=\""+file.getFilename()+"\"")
+                .body(file);
     }
 
     @PostMapping

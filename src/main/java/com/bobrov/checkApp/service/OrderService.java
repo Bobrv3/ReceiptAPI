@@ -1,6 +1,7 @@
 package com.bobrov.checkApp.service;
 
 import com.bobrov.checkApp.model.Order;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 
 import javax.validation.constraints.Min;
@@ -18,4 +19,6 @@ public interface OrderService {
     void delete(@Min(1) Long id);
 
     void makeReceipt(@Min(1) Long id);
+
+    Resource load(String id);
 }
