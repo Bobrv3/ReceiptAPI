@@ -5,12 +5,13 @@ import com.bobrov.checkApp.model.DiscountCard;
 import com.bobrov.checkApp.service.DiscountCardService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,28 +25,31 @@ public class DiscountCardImpl implements DiscountCardService {
     }
 
     @Override
-    public List<DiscountCard> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
-        return repository.findAll(PageRequest.of(offset, limit)).getContent();
+    public Page<DiscountCard> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
+        return repository.findAll(PageRequest.of(offset, limit));
     }
 
     // ToDO DiscountCard validation
     @Override
+    @Transactional
     public DiscountCard save(@NotNull DiscountCard card) {
         return repository.save(card);
     }
 
     @Override
-    public DiscountCard update(@NotNull DiscountCard card) {
-        findById(card.getId());
+    @Transactional
+    public DiscountCard update(@Min(1) Long id, @NotNull DiscountCard card) {
+        findById(id);
 
         return repository.save(card);
     }
 
     @Override
+    @Transactional
     public void delete(@Min(1) Long id) {
-        findById(id);
+        DiscountCard card = findById(id);
 
-        repository.deleteById(id);
+        card.setStatus(DiscountCard.DiscountCardStatus.DELETED);
     }
 }
  

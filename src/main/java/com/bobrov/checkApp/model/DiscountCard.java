@@ -7,9 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +27,11 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "status = 0")
 public class DiscountCard {
+    public enum DiscountCardStatus {
+        ACTIVE, DELETED
+    }
     private static final String SEQ_NAME = "discount_card_seq";
 
     @Id
@@ -35,6 +42,11 @@ public class DiscountCard {
 
     @Column(nullable = false)
     private BigDecimal discountSize;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    @Builder.Default
+    private DiscountCardStatus status = DiscountCardStatus.ACTIVE;
 
     @Override
     public boolean equals(Object o) {

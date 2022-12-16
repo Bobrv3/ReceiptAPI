@@ -10,8 +10,9 @@ DROP SEQUENCE IF EXISTS order_seq CASCADE;
 CREATE SEQUENCE discount_card_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE  discount_cards (
   id BIGINT NOT NULL,
- discount_size DECIMAL NOT NULL,
- CONSTRAINT pk_discount_cards PRIMARY KEY (id)
+  discount_size DECIMAL NOT NULL,
+  status INTEGER NOT NULL,
+  CONSTRAINT pk_discount_cards PRIMARY KEY (id)
 );
 
 CREATE SEQUENCE  IF NOT EXISTS product_seq START WITH 1 INCREMENT BY 1;
