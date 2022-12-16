@@ -17,7 +17,7 @@ CREATE TABLE  discount_cards (
 CREATE SEQUENCE  IF NOT EXISTS product_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE products (
   id BIGINT NOT NULL,
-   description VARCHAR(255) NOT NULL,
+   description VARCHAR(16) NOT NULL,
    price DECIMAL NOT NULL,
    status INTEGER,
    CONSTRAINT pk_products PRIMARY KEY (id)

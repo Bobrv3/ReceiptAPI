@@ -35,7 +35,7 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 16)
     private String description;
 
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class Product {
 
     @Enumerated(EnumType.ORDINAL)
     @Column
-    private ProductStatus status;
+    private SaleStatus status;
 
     @Override
     public boolean equals(Object o) {
