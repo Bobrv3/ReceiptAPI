@@ -1,6 +1,7 @@
 package com.bobrov.checkApp.service.impl;
 
 import com.bobrov.checkApp.dao.OrderRepository;
+import com.bobrov.checkApp.model.DiscountCard;
 import com.bobrov.checkApp.model.Order;
 import com.bobrov.checkApp.model.OrderItem;
 import com.bobrov.checkApp.service.OrderService;
@@ -16,11 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,10 +55,10 @@ public class OrderImpl implements OrderService {
             QTY DESCRIPTION         PRICE   TOTAL
             """;
     private static final String ITEM_OF_RECEIPT_WITHOUT_SALE = """
-            %s   %s                $%s    $%s
+            %s\t%s\t\t$%s\t$%s
             """;
     private static final String ITEM_OF_RECEIPT_WITH_SALE = """
-            %s   %s                $%s    $%s
+            %s\t%s\t\t$%s\t$%s
                                  discount = $%s
             """;
     private static final String FOOTER_OF_RECEIPT = """
@@ -114,7 +119,8 @@ public class OrderImpl implements OrderService {
     public void makeReceipt(@Min(1) Long id) {
         Order order = findById(id);
 
-        try (FileWriter writer = new FileWriter(String.format(FILE_PATH, DIRECTORY_PATH, id))) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(String.format(FILE_PATH, DIRECTORY_PATH, id)), StandardCharsets.UTF_8))) {
             /////// HEAD
             String receiptHead = String.format(HEAD_OF_RECEIPT, LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                     , LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
@@ -146,9 +152,13 @@ public class OrderImpl implements OrderService {
                             .multiply(BigDecimal.valueOf(item.getQuantity())))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal totalDiscountByCard = totalPriceWithoutDiscount
-                    .multiply(calculateDiscountMultiplier(order.getDiscountCard().getDiscountSize()))
-                    .setScale(2, RoundingMode.DOWN);
+            DiscountCard discountCard = order.getDiscountCard();
+            BigDecimal totalDiscountByCard = BigDecimal.ZERO;
+            if (discountCard != null) {
+                totalDiscountByCard = totalPriceWithoutDiscount
+                        .multiply(calculateDiscountMultiplier(discountCard.getDiscountSize()))
+                        .setScale(2, RoundingMode.DOWN);
+            }
 
             BigDecimal totalDiscount = totalDiscountByCard.add(totalDiscountOnSalesItems);
 
@@ -167,15 +177,14 @@ public class OrderImpl implements OrderService {
 
         try {
             Resource resource = new UrlResource(file.toUri());
-            if(resource.exists() || resource.isReadable()){
+            if (resource.exists() || resource.isReadable()) {
                 return resource;
-            }else{
+            } else {
                 throw new RuntimeException("Could not read the file.");
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Error:"+e.getMessage());
+            throw new RuntimeException("Error:" + e.getMessage());
         }
-
     }
 
     private BigDecimal makeBodyItemWithSale(StringBuilder receiptBuilder, OrderItem item) {
