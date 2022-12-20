@@ -1,0 +1,18 @@
+package com.bobrov.receipt_api.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * A DTO for the {@link com.bobrov.receipt_api.model.OrderItem} entity
+ */
+@Data
+@Builder
+@AllArgsConstructor
+public class OrderItemDto implements Serializable {
+    private Integer quantity;
+    private ProductDto product;
+}
