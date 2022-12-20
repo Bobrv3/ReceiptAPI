@@ -1,18 +1,15 @@
 package com.bobrov.checkApp.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
@@ -26,20 +23,18 @@ import java.util.Objects;
 @Builder
 public class OrderItem {
     @EmbeddedId
-    @Setter(AccessLevel.NONE)
-    private OrderItemId id;
+    @Builder.Default
+    private OrderItemId id = new OrderItemId();
 
     @Column(nullable = false)
     private Integer quantity;
 
     @MapsId("productId")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Product product;
 
     @MapsId("orderId")
-    @ManyToOne(optional = false)
-    @ToString.Exclude
-    @JsonIgnore
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Order order;
 
     void setOrder(Order order) {

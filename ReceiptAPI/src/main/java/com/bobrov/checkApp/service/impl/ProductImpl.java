@@ -1,6 +1,8 @@
 package com.bobrov.checkApp.service.impl;
 
 import com.bobrov.checkApp.dao.ProductRepository;
+import com.bobrov.checkApp.dto.ProductDto;
+import com.bobrov.checkApp.dto.mapper.ProductMapper;
 import com.bobrov.checkApp.model.Product;
 import com.bobrov.checkApp.service.ProductService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
@@ -11,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 @Service
 @RequiredArgsConstructor
@@ -31,24 +33,26 @@ public class ProductImpl implements ProductService {
         return repository.findAll(PageRequest.of(offset, limit));
     }
 
-    // ToDO Product validation
     @Override
     @Transactional
-    public Product save(@NotNull Product product) {
+    public Product save(@Valid ProductDto productDto) {
+        return repository.save(
+                ProductMapper.INSTANCE.toModel(productDto)
+        );
+    }
+
+    @Override
+    @Transactional
+    public Product update(@Min(1) Long id, @Valid ProductDto productDto) {
+        Product product = findById(id);
+        ProductMapper.INSTANCE.updateModel(productDto, product);
+
         return repository.save(product);
     }
 
     @Override
     @Transactional
-    public Product update(@Min(1) Long id, @NotNull Product product) {
-        findById(id);
-
-        return repository.save(product);
-    }
-
-    @Override
-    @Transactional
-    public void delete(@Min(1) Long id) {
+    public void deleteById(@Min(1) Long id) {
         Product product = findById(id);
 
         product.setStatus(Product.ProductStatus.DELETED);

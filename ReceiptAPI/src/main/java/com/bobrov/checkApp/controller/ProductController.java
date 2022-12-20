@@ -1,5 +1,7 @@
 package com.bobrov.checkApp.controller;
 
+import com.bobrov.checkApp.dto.ProductDto;
+import com.bobrov.checkApp.dto.mapper.ProductMapper;
 import com.bobrov.checkApp.model.Product;
 import com.bobrov.checkApp.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
+    private static final String ID_PATH_VARIABLE = "/{id:\\d+}";
     private final ProductService service;
 
     @GetMapping
@@ -33,14 +36,16 @@ public class ProductController {
         return service.findAll(offset, limit);
     }
 
-    @GetMapping("/{id:\\d+}")
-    public Product get(@PathVariable Long id) {
-        return service.findById(id);
+    @GetMapping(ID_PATH_VARIABLE)
+    public ProductDto get(@PathVariable Long id) {
+        return ProductMapper.INSTANCE.toDto(
+                service.findById(id)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody Product product) {
-        Product savedProduct = service.save(product);
+    public ResponseEntity<Object> save(@RequestBody ProductDto productDto) {
+        Product product = service.save(productDto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(product.getId())
@@ -48,21 +53,21 @@ public class ProductController {
 
         return ResponseEntity
                 .created(uri)
-                .body(savedProduct);
+                .body(ProductMapper.INSTANCE.toDto(product));
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping(ID_PATH_VARIABLE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(
-            @RequestBody Product product,
+            @RequestBody ProductDto productDto,
             @PathVariable Long id
     ) {
-        service.update(id, product);
+        service.update(id, productDto);
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping(ID_PATH_VARIABLE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        service.deleteById(id);
     }
 }

@@ -1,7 +1,10 @@
 package com.bobrov.checkApp.controller;
 
+import com.bobrov.checkApp.dto.OrderDto;
+import com.bobrov.checkApp.dto.mapper.OrderMapper;
 import com.bobrov.checkApp.model.Order;
 import com.bobrov.checkApp.service.OrderService;
+import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -26,6 +29,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
+    private static final String ID_PATH_VARIABLE = "/{id:\\d+}";
     private final OrderService service;
 
     @GetMapping
@@ -35,16 +39,18 @@ public class OrderController {
         return service.findAll(offset, limit);
     }
 
-    @GetMapping("/{id:\\d+}")
-    public Order get(@PathVariable Long id) {
-        return service.findById(id);
+    @GetMapping(ID_PATH_VARIABLE)
+    public OrderDto get(@PathVariable Long id) {
+        return OrderMapper.INSTANCE.toDto(
+                service.findById(id)
+        );
     }
 
     @GetMapping("/{id:\\d+}/receipt")
     public ResponseEntity<Resource> getReceipt(@PathVariable Long id){
         service.makeReceipt(id);
 
-        Resource file = service.load(id.toString());
+        Resource file = service.load(id);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment;filename=\""+file.getFilename()+"\"")
@@ -52,8 +58,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody Order order) {
-        Order savedOrder = service.save(order);
+    public ResponseEntity<Object> save(@RequestBody OrderDto orderDto) {
+        Order order = service.save(orderDto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(order.getId())
@@ -61,21 +67,28 @@ public class OrderController {
 
         return ResponseEntity
                 .created(uri)
-                .body(savedOrder);
+                .body(OrderMapper.INSTANCE.toDto(order));
     }
 
-    @PutMapping("/{id:\\d+}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(
-            @RequestBody Order order,
+    @PutMapping(ID_PATH_VARIABLE)
+    public ResponseEntity<Object> update(
+            @RequestBody OrderDto orderDto,
             @PathVariable Long id
     ) {
-        service.update(id, order);
+        try {
+            service.findById(orderDto.getId());
+        } catch (NotFoundException e) {
+            return save(orderDto);
+        }
+
+        service.update(id, orderDto);
+        return ResponseEntity.noContent()
+                .build();
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping(ID_PATH_VARIABLE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        service.deleteById(id);
     }
 }

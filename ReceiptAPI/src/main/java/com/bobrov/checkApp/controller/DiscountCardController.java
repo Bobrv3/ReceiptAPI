@@ -1,5 +1,7 @@
 package com.bobrov.checkApp.controller;
 
+import com.bobrov.checkApp.dto.DiscountCardDto;
+import com.bobrov.checkApp.dto.mapper.DiscountCardMapper;
 import com.bobrov.checkApp.model.DiscountCard;
 import com.bobrov.checkApp.service.DiscountCardService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/discount-cards")
 @RequiredArgsConstructor
 public class DiscountCardController {
+    private static final String ID_PATH_VARIABLE = "/{id:\\d+}";
     private final DiscountCardService service;
 
     @GetMapping
@@ -33,14 +36,16 @@ public class DiscountCardController {
         return service.findAll(offset, limit);
     }
 
-    @GetMapping("/{id:\\d+}")
-    public DiscountCard get(@PathVariable Long id) {
-        return service.findById(id);
+    @GetMapping(ID_PATH_VARIABLE)
+    public DiscountCardDto get(@PathVariable Long id) {
+        return DiscountCardMapper.INSTANCE.toDto(
+                service.findById(id)
+        );
     }
 
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody DiscountCard card) {
-        DiscountCard discountCard = service.save(card);
+    public ResponseEntity<Object> save(@RequestBody DiscountCardDto cardDto) {
+        DiscountCard card = service.save(cardDto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(card.getId())
@@ -48,21 +53,21 @@ public class DiscountCardController {
 
         return ResponseEntity
                 .created(uri)
-                .body(discountCard);
+                .body(DiscountCardMapper.INSTANCE.toDto(card));
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping(ID_PATH_VARIABLE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(
-            @RequestBody DiscountCard card,
+            @RequestBody DiscountCardDto cardDto,
             @PathVariable Long id
     ) {
-        service.update(id, card);
+        service.update(id, cardDto);
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping(ID_PATH_VARIABLE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        service.deleteById(id);
     }
 }

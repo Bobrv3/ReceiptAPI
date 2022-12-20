@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,7 +17,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -44,14 +44,15 @@ public class Order {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private DiscountCard discountCard;
 
-    @OneToMany(
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST},
             orphanRemoval = true,
-            fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+            fetch = FetchType.LAZY,
+            mappedBy = "order")
     @Builder.Default
+    @Setter(AccessLevel.NONE)
     private List<OrderItem> items = new ArrayList<>();
 
     @Enumerated(EnumType.ORDINAL)

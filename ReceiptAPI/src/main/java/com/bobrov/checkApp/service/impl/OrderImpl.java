@@ -1,9 +1,14 @@
 package com.bobrov.checkApp.service.impl;
 
+import com.bobrov.checkApp.dao.DiscountCardRepository;
 import com.bobrov.checkApp.dao.OrderRepository;
+import com.bobrov.checkApp.dao.ProductRepository;
+import com.bobrov.checkApp.dto.OrderDto;
+import com.bobrov.checkApp.dto.mapper.OrderItemMapper;
 import com.bobrov.checkApp.model.DiscountCard;
 import com.bobrov.checkApp.model.Order;
 import com.bobrov.checkApp.model.OrderItem;
+import com.bobrov.checkApp.model.Product;
 import com.bobrov.checkApp.service.OrderService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,12 +43,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class OrderImpl implements OrderService {
 
     private final Path path = Paths.get("receipts");
     private static final String FILE_PATH = "%s/%s.txt";
     private static final String DIRECTORY_PATH = "./receipts";
-    private final OrderRepository repository;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final DiscountCardRepository discountCardRepository;
     private static final String HEAD_OF_RECEIPT = """
                          CASH RECEIPT
                         SUPERMARKET-123
@@ -82,33 +91,73 @@ public class OrderImpl implements OrderService {
 
     @Override
     public Order findById(@Min(1) Long id) {
-        return repository.findById(id)
+        return orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
     @Override
     public Page<Order> findAll(@Min(0) Integer offset, @Min(1) Integer limit) {
-        return repository.findAll(PageRequest.of(offset, limit));
-    }
-
-    // ToDO order validation(!null, description: length < 16)
-    @Override
-    @Transactional
-    public Order save(@NotNull Order order) {
-        return repository.save(order);
+        return orderRepository.findAll(PageRequest.of(offset, limit));
     }
 
     @Override
     @Transactional
-    public Order update(@Min(1) Long id, @NotNull Order order) {
-        findById(id);
-        // Todo доделать с mapstruct
-        return repository.save(order);
+    public Order save(@Valid OrderDto orderDto) {
+        Order newOrder = new Order();
+
+        DiscountCard discountCard = discountCardRepository.findById(orderDto.getDiscountCard().getId())
+                .orElseThrow(() -> new NotFoundException(orderDto.getDiscountCard().getId()));
+        newOrder.setDiscountCard(discountCard);
+
+        orderDto.getItems().stream()
+                .forEach(orderItem -> {
+                    Product product = productRepository.findById(orderItem.getProduct().getId())
+                            .orElseThrow(() -> new NotFoundException(orderItem.getProduct().getId()));
+
+                    OrderItem item = new OrderItem();
+                    item.setProduct(product);
+                    item.setQuantity(orderItem.getQuantity());
+
+                    newOrder.addItem(item);
+                });
+
+        return orderRepository.save(newOrder);
+
     }
 
     @Override
     @Transactional
-    public void delete(@Min(1) Long id) {
+    public Order update(@Min(1) Long id, @Valid OrderDto orderDto) {
+        Order order = findById(id);
+
+        order.getItems().clear();
+        orderRepository.flush();
+
+        if (orderDto.getStatus() != null) {
+            order.setStatus(orderDto.getStatus());
+        }
+
+        DiscountCard discountCard = discountCardRepository.findById(orderDto.getDiscountCard().getId())
+                .orElseThrow(() -> new NotFoundException(orderDto.getDiscountCard().getId()));
+        order.setDiscountCard(discountCard);
+
+        orderDto.getItems().stream()
+                .forEach(orderItem -> {
+                    Product product = productRepository.findById(orderItem.getProduct().getId())
+                            .orElseThrow(() -> new NotFoundException(orderItem.getProduct().getId()));
+
+                    OrderItem item = OrderItemMapper.INSTANCE.toItem(orderItem);
+                    order.addItem(item);
+                    item.setProduct(product);
+                    item.setQuantity(orderItem.getQuantity());
+                });
+
+        return orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(@Min(1) Long id) {
         Order order = findById(id);
 
         order.setStatus(Order.OrderStatus.DELETED);
@@ -172,7 +221,7 @@ public class OrderImpl implements OrderService {
     }
 
     @Override
-    public Resource load(String id) {
+    public Resource load(@Min(1) Long id) {
         Path file = path.resolve(String.format("%s.txt", id));
 
         try {
