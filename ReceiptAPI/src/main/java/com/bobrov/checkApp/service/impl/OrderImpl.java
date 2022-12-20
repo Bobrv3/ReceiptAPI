@@ -9,6 +9,7 @@ import com.bobrov.checkApp.model.DiscountCard;
 import com.bobrov.checkApp.model.Order;
 import com.bobrov.checkApp.model.OrderItem;
 import com.bobrov.checkApp.model.Product;
+import com.bobrov.checkApp.model.Sale;
 import com.bobrov.checkApp.service.OrderService;
 import com.bobrov.checkApp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -170,31 +171,24 @@ public class OrderImpl implements OrderService {
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(String.format(FILE_PATH, DIRECTORY_PATH, id)), StandardCharsets.UTF_8))) {
-            /////// HEAD
+
             String receiptHead = String.format(HEAD_OF_RECEIPT, LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                     , LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 
-            /////// BODY
             StringBuilder receiptBuilder = new StringBuilder(receiptHead);
 
             List<OrderItem> items = order.getItems();
             List<BigDecimal> itemsDiscounts = new ArrayList<>();
             for (OrderItem item : items) {
-                switch (item.getProduct().getSaleStatus()) {
-                    // todo возможно сделать для скидок отдельную таблицу, где смогу задавать 1) кол-во, после которого применяется скидка 2) ее размер
-                    case ON_SALE_IF_QUANTITY_GT_5 -> {
-                        if (item.getQuantity() > 5) {
-                            BigDecimal itemDiscount = makeBodyItemWithSale(receiptBuilder, item);
-                            itemsDiscounts.add(itemDiscount);
-                        } else {
-                            makeBodyItemWithoutSale(receiptBuilder, item);
-                        }
-                    }
-                    default -> makeBodyItemWithoutSale(receiptBuilder, item);
+                Sale sale = item.getProduct().getSale();
+                if (sale != null && item.getQuantity() > sale.getFromQuantity()) {
+                    BigDecimal itemDiscount = makeBodyItemWithSale(receiptBuilder, item);
+                    itemsDiscounts.add(itemDiscount);
+                } else {
+                    makeBodyItemWithoutSale(receiptBuilder, item);
                 }
             }
 
-            /////// FOOTER
             BigDecimal totalDiscountOnSalesItems = itemsDiscounts.stream()
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -242,7 +236,7 @@ public class OrderImpl implements OrderService {
     private BigDecimal makeBodyItemWithSale(StringBuilder receiptBuilder, OrderItem item) {
         BigDecimal totalPrice = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
 
-        BigDecimal discountOnSale = BigDecimal.valueOf(10);  // TODo вынести в сущность
+        BigDecimal discountOnSale = item.getProduct().getSale().getDiscountSize();
         BigDecimal discountOnItem = totalPrice.multiply(calculateDiscountMultiplier(discountOnSale))
                 .setScale(2, RoundingMode.DOWN);
 

@@ -10,12 +10,19 @@ VALUES
 
 INSERT
 INTO
-  products
-  (id, description, price, sale_status, status)
+    sales
+    (id, discount_size, from_quantity, status)
 VALUES
-  (nextval('product_seq'), 'Milk', 1.6, 0, 0),
-  (nextval('product_seq'), 'Bread', 1.45, 1,0),
-  (nextval('product_seq'), 'Meat', 7.5, 0, 0),
+    (nextval('sale_seq'), 10, 5, 0);
+
+INSERT
+INTO
+  products
+  (id, description, price, sale_id, status)
+VALUES
+  (nextval('product_seq'), 'Milk', 1.6, null, 0),
+  (nextval('product_seq'), 'Bread', 1.45, null, 0),
+  (nextval('product_seq'), 'Meat', 7.5, null, 0),
   (nextval('product_seq'), 'Apple', 2, 1, 0),
   (nextval('product_seq'), 'Banana', 2.45, 1, 0);
 

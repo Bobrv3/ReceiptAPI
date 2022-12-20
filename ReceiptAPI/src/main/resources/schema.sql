@@ -2,10 +2,12 @@ DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS discount_cards;
+DROP TABLE IF EXISTS sales;
 
 DROP SEQUENCE IF EXISTS product_seq CASCADE;
 DROP SEQUENCE IF EXISTS discount_card_seq CASCADE;
 DROP SEQUENCE IF EXISTS order_seq CASCADE;
+DROP SEQUENCE IF EXISTS sale_seq CASCADE;
 
 CREATE SEQUENCE discount_card_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE  discount_cards (
@@ -15,15 +17,25 @@ CREATE TABLE  discount_cards (
   CONSTRAINT pk_discount_cards PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE  IF NOT EXISTS sale_seq START WITH 1 INCREMENT BY 1;
+CREATE TABLE sales (
+  id BIGINT NOT NULL,
+   discount_size DECIMAL NOT NULL,
+   from_quantity INTEGER NOT NULL,
+   status INTEGER NOT NULL,
+   CONSTRAINT pk_sales PRIMARY KEY (id)
+);
+
 CREATE SEQUENCE  IF NOT EXISTS product_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE products (
   id BIGINT NOT NULL,
-     description VARCHAR(16) NOT NULL,
-     price DECIMAL NOT NULL,
-     sale_status INTEGER NOT NULL,
-     status INTEGER NOT NULL,
-     CONSTRAINT pk_products PRIMARY KEY (id)
+   description VARCHAR(16) NOT NULL,
+   price DECIMAL NOT NULL,
+   sale_id BIGINT,
+   status INTEGER NOT NULL,
+   CONSTRAINT pk_products PRIMARY KEY (id)
 );
+ALTER TABLE products ADD CONSTRAINT FK_PRODUCTS_ON_SALE FOREIGN KEY (sale_id) REFERENCES sales (id);
 
 CREATE SEQUENCE order_seq START WITH 1 INCREMENT BY 1;
 CREATE TABLE  orders (

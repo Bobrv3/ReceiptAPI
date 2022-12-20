@@ -1,6 +1,6 @@
 package com.bobrov.checkApp.dto;
 
-import com.bobrov.checkApp.model.Product;
+import com.bobrov.checkApp.model.Sale;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,30 +8,25 @@ import lombok.Data;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * A DTO for the {@link Product} entity
+ * A DTO for the {@link com.bobrov.checkApp.model.Sale} entity
  */
 @Data
 @Builder
 @AllArgsConstructor
-public class ProductDto implements Serializable {
-    @Min(value = 1)
+public class SaleDto implements Serializable {
+    @Min(1)
     private Long id;
-
-    @NotBlank
-    @Size(min = 2, max = 16)
-    private String description;
 
     @DecimalMin(value = "0.0", inclusive = false)
     @Digits(integer=4, fraction=2)
-    private BigDecimal price;
+    private BigDecimal discountSize;
 
-    private SaleDto sale;
+    @Min(1)
+    private Integer fromQuantity;
 
-    private Product.ProductStatus status;
+    private Sale.SaleStatus status;
 }
