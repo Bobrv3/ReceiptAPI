@@ -186,6 +186,8 @@ public class OrderImpl implements OrderService {
                         if (item.getQuantity() > 5) {
                             BigDecimal itemDiscount = makeBodyItemWithSale(receiptBuilder, item);
                             itemsDiscounts.add(itemDiscount);
+                        } else {
+                            makeBodyItemWithoutSale(receiptBuilder, item);
                         }
                     }
                     default -> makeBodyItemWithoutSale(receiptBuilder, item);
@@ -215,6 +217,7 @@ public class OrderImpl implements OrderService {
             receiptBuilder.append(String.format(FOOTER_OF_RECEIPT, totalPriceWithoutDiscount, totalDiscountByCard, totalDiscount, totalPriceWithDiscount));
 
             writer.write(receiptBuilder.toString());
+            System.out.println(receiptBuilder);
         } catch (IOException e) {
             throw new RuntimeException("Problems with file for saving receipt");
         }

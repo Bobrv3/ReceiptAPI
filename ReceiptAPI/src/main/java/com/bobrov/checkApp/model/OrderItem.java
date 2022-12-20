@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
@@ -35,6 +36,7 @@ public class OrderItem {
 
     @MapsId("orderId")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Order order;
 
     void setOrder(Order order) {

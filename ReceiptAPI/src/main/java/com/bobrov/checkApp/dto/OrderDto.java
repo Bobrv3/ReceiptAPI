@@ -1,6 +1,8 @@
 package com.bobrov.checkApp.dto;
 
 import com.bobrov.checkApp.model.Order;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -12,6 +14,8 @@ import java.util.List;
  * A DTO for the {@link Order} entity
  */
 @Data
+@Builder
+@AllArgsConstructor
 public class OrderDto implements Serializable {
     @Min(1)
     private Long id;
