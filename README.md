@@ -19,17 +19,6 @@ Default values when starting the application:
 
 To change the default values, you need to change the corresponding variables in the <a href=https://github.com/Bobrv3/ReceiptAPI/blob/main/.env.default>.env.default</a> file
 
-## Another way to start app and get a receipt
-1. Clone a repository with a project:<br>
-   <code>git clone https://github.com/Bobrv3/ReceiptAPI.git</code>
-2. The application runs java RunnerClassName <set_parameters>, where the set of
-   parameters in the format itemId-quantity (itemId - item identifier, quantity - its quantity)
-   For example:<br>
-   <code>java CheckRunner 6-1 2-2 5-7 card-1</code>
-   Card-1 means that a discount card with the number 1 was presented
-   The receipt will be displayed in the console and saved to a file at the following path:
-   <code>ReceiptApp\ReceiptAPI\receipts</code>
-
 ## Endpoints
 ### Order
 + <pre>GET       /api/v1/orders/{id}	  Getting a specific order by id</pre>
