@@ -1,6 +1,6 @@
 package com.bobrov.receipt_api.dao;
 
-import com.bobrov.receipt_api.model.DiscountCard;
+import com.bobrov.receipt_api.model.Sale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +25,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         @Sql("/test_data.sql")
 
 })
-class DiscountCardRepositoryTest {
+class SaleRepositoryTest {
     private static final int INIT_SIZE = 1;
-    private DiscountCard card = DiscountCard.builder()
+    private Sale sale = Sale.builder()
             .id(1L)
-            .discountSize(BigDecimal.valueOf(5))
+            .discountSize(BigDecimal.valueOf(10))
+            .fromQuantity(5)
             .build();
 
     @Autowired
-    DiscountCardRepository repository;
+    SaleRepository repository;
 
     @Test
-    @DisplayName("Test discountCard mapping")
+    @DisplayName("Test sale mapping")
     public void testMapping() {
-        repository.findById(card.getId());
+        repository.findById(sale.getId());
 
-        DiscountCard reference = repository.getReferenceById(card.getId());
+        Sale reference = repository.getReferenceById(sale.getId());
 
-        List<DiscountCard> cards = repository.findAll();
+        List<Sale> sales = repository.findAll();
 
         assertAll(
-                () -> assertEquals(reference.getDiscountSize(), card.getDiscountSize()),
-                () -> assertThat(cards)
+                () -> assertEquals(reference.getDiscountSize(), sale.getDiscountSize()),
+                () -> assertThat(sales)
                         .hasSize(INIT_SIZE)
-                        .contains(card)
+                        .contains(sale)
         );
     }
 }

@@ -3,7 +3,7 @@ INTO
   discount_cards
   (id, discount_size, status)
 VALUES
-  (nextval('discount_card_seq'), 1, 0);
+  (nextval('discount_card_seq'), 5, 0);
 
 INSERT
 INTO

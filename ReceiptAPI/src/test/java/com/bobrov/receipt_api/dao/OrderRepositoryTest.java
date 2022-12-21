@@ -1,6 +1,10 @@
 package com.bobrov.receipt_api.dao;
 
 import com.bobrov.receipt_api.model.DiscountCard;
+import com.bobrov.receipt_api.model.Order;
+import com.bobrov.receipt_api.model.OrderItem;
+import com.bobrov.receipt_api.model.Product;
+import com.bobrov.receipt_api.model.Sale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +29,49 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         @Sql("/test_data.sql")
 
 })
-class DiscountCardRepositoryTest {
-    private static final int INIT_SIZE = 1;
+class OrderRepositoryTest {
+    private static final int INIT_SIZE = 2;
+    private Sale sale = Sale.builder()
+            .id(1L)
+            .discountSize(BigDecimal.valueOf(10))
+            .fromQuantity(5)
+            .build();
     private DiscountCard card = DiscountCard.builder()
             .id(1L)
             .discountSize(BigDecimal.valueOf(5))
             .build();
+    private Product product = Product.builder()
+            .id(1L)
+            .description("Milk")
+            .price(BigDecimal.valueOf(1.6))
+            .sale(sale)
+            .build();
 
     @Autowired
-    DiscountCardRepository repository;
+    OrderRepository repository;
 
     @Test
-    @DisplayName("Test discountCard mapping")
+    @DisplayName("Test order mapping")
     public void testMapping() {
-        repository.findById(card.getId());
+        Order order = Order.builder()
+                .id(1L)
+                .discountCard(card)
+                .build();
+        order.addItem(OrderItem.builder()
+                .product(product)
+                .quantity(6)
+                .build());
 
-        DiscountCard reference = repository.getReferenceById(card.getId());
+        repository.findById(order.getId());
 
-        List<DiscountCard> cards = repository.findAll();
+        Order reference = repository.getReferenceById(order.getId());
+
+        List<Order> orders = repository.findAll();
 
         assertAll(
-                () -> assertEquals(reference.getDiscountSize(), card.getDiscountSize()),
-                () -> assertThat(cards)
+                () -> assertEquals(reference.getDiscountCard(), order.getDiscountCard()),
+                () -> assertThat(orders)
                         .hasSize(INIT_SIZE)
-                        .contains(card)
         );
     }
 }

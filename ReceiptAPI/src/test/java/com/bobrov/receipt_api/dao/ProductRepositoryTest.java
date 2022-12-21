@@ -1,6 +1,7 @@
 package com.bobrov.receipt_api.dao;
 
-import com.bobrov.receipt_api.model.DiscountCard;
+import com.bobrov.receipt_api.model.Product;
+import com.bobrov.receipt_api.model.Sale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,30 +26,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         @Sql("/test_data.sql")
 
 })
-class DiscountCardRepositoryTest {
-    private static final int INIT_SIZE = 1;
-    private DiscountCard card = DiscountCard.builder()
+class ProductRepositoryTest {
+    private static final int INIT_SIZE = 2;
+    private Sale sale = Sale.builder()
             .id(1L)
-            .discountSize(BigDecimal.valueOf(5))
+            .discountSize(BigDecimal.valueOf(10))
+            .fromQuantity(5)
+            .build();
+    private Product product = Product.builder()
+            .id(1L)
+            .description("Milk")
+            .price(BigDecimal.valueOf(1.6))
+            .sale(sale)
             .build();
 
     @Autowired
-    DiscountCardRepository repository;
+    ProductRepository repository;
 
     @Test
-    @DisplayName("Test discountCard mapping")
+    @DisplayName("Test product mapping")
     public void testMapping() {
-        repository.findById(card.getId());
+        repository.findById(product.getId());
 
-        DiscountCard reference = repository.getReferenceById(card.getId());
+        Product reference = repository.getReferenceById(product.getId());
 
-        List<DiscountCard> cards = repository.findAll();
+        List<Product> products = repository.findAll();
 
         assertAll(
-                () -> assertEquals(reference.getDiscountSize(), card.getDiscountSize()),
-                () -> assertThat(cards)
+                () -> assertEquals(reference.getSale(), product.getSale()),
+                () -> assertThat(products)
                         .hasSize(INIT_SIZE)
-                        .contains(card)
+                        .contains(product)
         );
     }
 }
