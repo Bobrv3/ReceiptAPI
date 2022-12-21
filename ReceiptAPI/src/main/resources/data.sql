@@ -20,7 +20,7 @@ INTO
   products
   (id, description, price, sale_id, status)
 VALUES
-  (nextval('product_seq'), 'Milk', 1.6, null, 0),
+  (nextval('product_seq'), 'Milk', 1.6, 1, 0),
   (nextval('product_seq'), 'Bread', 1.45, null, 0),
   (nextval('product_seq'), 'Meat', 7.5, null, 0),
   (nextval('product_seq'), 'Apple', 2, 1, 0),
