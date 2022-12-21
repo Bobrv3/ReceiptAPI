@@ -9,6 +9,7 @@ CRUD Restful API that implements the functionality of forming receipt in the sto
 3. Wait until the application is deployed.
 4. To check the success of the application start, and get the txt receipt:<br>
    <code>http://localhost:8080/api/v1/orders/1/receipt</code>
+   The download of the file with the .txt extension will begin
 
 Default values when starting the application:
 + server port: 8080
