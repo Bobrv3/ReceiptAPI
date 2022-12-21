@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,9 +20,10 @@ public class OrderDto implements Serializable {
     @Min(1)
     private Long id;
 
+    @Valid
     private DiscountCardDto discountCard;
 
-    @NotNull
+    @Valid
     private List<OrderItemDto> items;
 
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
@@ -31,6 +32,7 @@ public class ProductDto implements Serializable {
     @Digits(integer=4, fraction=2)
     private BigDecimal price;
 
+    @Valid
     private SaleDto sale;
 
     private Product.ProductStatus status;
